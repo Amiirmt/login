@@ -6,6 +6,7 @@ const { name } = require('ejs');
 
 exports.getsignup = (req, res) => {
 
+
     res.render('signup', {
         path: '/signup',
         pagetitle: 'ورود'
