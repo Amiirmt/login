@@ -12,11 +12,11 @@ app.set('views', 'views');
 
 app.use(bodyParser.urlencoded({
     extended: false
-}))
+}));
 
 
 
-const adminrouter = require('./routes/admin')
+const adminrouter = require('./routes/admin');
 
 app.use(adminrouter);
 

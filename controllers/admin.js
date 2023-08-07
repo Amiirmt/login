@@ -41,7 +41,7 @@ exports.postsignup = (req, res) => {
 
 
 
-}
+};
 
 
 exports.getlogin = (req, res) => {
@@ -51,7 +51,7 @@ exports.getlogin = (req, res) => {
         pagetitle: 'ورود'
     })
 
-}
+};
 
 
 exports.postlogin = (req, res) => {
