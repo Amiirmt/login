@@ -36,7 +36,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/')
         app.listen(3001, () => {
 
             console.log('connect to 3001');
-        });
+        })
 
     }).catch(err => {
 
