@@ -1,15 +1,17 @@
 const express = require('express');
-const User = require('../models/model')
+const Teacher = require('../models/teacher')
+const Student = require('../models/student')
 const path = require('path');
 const { log } = require('console');
 const { name } = require('ejs');
+const teacher = require('../models/teacher');
 
 exports.getsignup = (req, res) => {
 
 
     res.render('signup', {
         path: '/signup',
-        pagetitle: 'ورود'
+        pagetitle: 'ثبت نام'
     });
 
 }
@@ -17,38 +19,69 @@ exports.getsignup = (req, res) => {
 
 exports.postsignup = (req, res) => {
 
+    if (req.body.type === 'teacher') {
 
-    User.findOne({ password: req.body.password }).then(userdoc => {
+        Teacher.findOne({ password: req.body.password }).then(teachdoc => {
 
-        if (userdoc) {
-            return res.redirect("/signup");
-        }
+            if (teachdoc) {
+                console.log('this is exist');
+            }
+
+            const teacher = new Teacher({
+
+                name: req.body.name,
+                password: req.body.password,
+                namekarbary: req.body.namekarbary,
+                type: req.body.type
 
 
-        const user = new User({
+            })
+            return teacher.save().then(() => {
+                console.log('create in database');
+                res.redirect("/login")
 
-            name: req.body.name,
-            password: req.body.password,
-            namekarbary: req.body.namekarbary
-
-
+            }).catch(err => {
+                console.log(err);
+            })
         })
-        return user.save().then(() => {
-            console.log('create');
-        }).catch(err => {
-            console.log(err);
+
+    }
+
+    if (req.body.type === 'student') {
+
+        Teacher.findOne({ password: req.body.password }).then(studoc => {
+
+            if (studoc) {
+                console.log("this is exist");
+            }
+
+            const student = new Student({
+
+                name: req.body.name,
+                password: req.body.password,
+                namekarbary: req.body.namekarbary,
+                type: req.body.type
+
+
+            })
+            return student.save().then(() => {
+                console.log('create in database');
+                res.redirect("/login")
+            }).catch(err => {
+                console.log(err);
+            })
         })
-    })
+
+    }
 
 
-
-};
+}
 
 
 exports.getlogin = (req, res) => {
 
     res.render('login', {
-        path: '/signup',
+        path: '/login',
         pagetitle: 'ورود'
     })
 
@@ -60,23 +93,49 @@ exports.postlogin = (req, res) => {
     const namekarbary = req.body.namekarbary;
     const password = req.body.password;
 
-    User.findOne({
-        password: password,
-        namekarbary: namekarbary
 
-    }).then(userdoc => {
+    if (req.body.type === 'teacher') {
 
-        if (userdoc) {
+        Teacher.findOne({
+            password: password,
+            namekarbary: namekarbary
 
-            console.log("password is correct and welcome");
+        }).then(teachdoc => {
+
+            if (teachdoc) {
+
+                console.log("password is correct and welcome");
+                res.redirect("/dashboard/" + teachdoc._id + "");
 
 
-        } else {
+            } else {
 
-            console.log("password or namekarbary is incorrect");
-            return res.redirect("/signup")
+                console.log("password or namekarbary is incorrect");
+                return res.redirect("/signup")
 
-        }
-    })
+            }
+        })
+    }
+    if (req.body.type === 'student') {
 
+        Student.findOne({
+            password: password,
+            namekarbary: namekarbary
+
+        }).then(studoc => {
+
+            if (studoc) {
+
+                console.log("password is correct and welcome");
+                res.redirect("/dashboard/" + studoc._id + "");
+
+
+            } else {
+
+                console.log("password or namekarbary is incorrect");
+                return res.redirect("/signup")
+
+            }
+        })
+    }
 }

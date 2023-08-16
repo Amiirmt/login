@@ -3,7 +3,7 @@ const express = require('express');
 
 const schema = mongoose.Schema;
 
-const User = new schema({
+const Teacher = new schema({
 
     name: {
         type: String
@@ -13,7 +13,15 @@ const User = new schema({
     },
     password: {
         type: String
+    },
+    type: {
+        type: String
+    },
+    course: {
+        type: String
     }
+
+
 
 });
 
@@ -39,4 +47,4 @@ const User = new schema({
 //create();
 
 
-module.exports = mongoose.model('User', User);
+module.exports = mongoose.model('Teacher', Teacher);

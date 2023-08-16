@@ -14,21 +14,18 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 
-
-
 const adminrouter = require('./routes/admin');
+
+const dashboardrouter = require('./routes/dashboard');
+
+app.use(dashboardrouter);
+
 
 app.use(adminrouter);
 
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-/*app.get('/', (req, res) => {
-
-    res.sendFile(path.join(__dirname, 'views', 'nav.html'))
-
-})*/
 
 mongoose.connect('mongodb://127.0.0.1:27017/')
     .then(result => {

@@ -2,7 +2,9 @@
 <html>
 
 <head>
-    <title> ورود </title>
+    <title>
+        <%= pagetitle %>
+    </title>
 </head>
 
 <body bgcolor="aqua">
@@ -15,6 +17,18 @@
         <input type="text" name="namekarbary" id="namekarbary" placeholder="select namekarbary">
         <br>
         <input type="text" name="password" id="password" placeholder="select password">
+        <br>
+
+        <select name="type">
+
+            <option>teacher</option>
+            <option>student</option>
+
+        </select>
+        <br>
+
+
+
         <button type="submit">send </button>
 
     </form>
