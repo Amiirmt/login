@@ -16,6 +16,17 @@ const Student = new schema({
     },
     type: {
         type: String
+    },
+    courses: {
+        items: [{
+            courseid: {
+                type: schema.Types.ObjectId,
+                ref: 'Course'
+            },
+            name: {
+                type: String
+            }
+        }]
     }
 
 
@@ -41,6 +52,27 @@ const Student = new schema({
 //}
 
 //create();
+
+Student.methods.addco = function(x) {
+    const index = this.courses.items.findIndex(cp => {
+        return cp.courseid.toString() === x.toString();
+    });
+    const update = [...this.courses.items];
+    update.push({
+        courseid: x,
+        name: x.name
+    })
+    const updated = {
+        items: update
+    };
+    this.courses = updated;
+
+
+    this.save();
+
+
+}
+
 
 
 module.exports = mongoose.model('Student', Student);

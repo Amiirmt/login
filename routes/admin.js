@@ -12,4 +12,10 @@ router.get('/login', admincontroll.getlogin);
 
 router.post('/login', admincontroll.postlogin);
 
+router.get('/admin/addpakage/:userid', admincontroll.getaddpakage);
+
+router.post('/admin/addpakage', admincontroll.postaddpakage);
+
+
+
 module.exports = router;

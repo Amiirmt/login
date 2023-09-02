@@ -17,34 +17,36 @@ const Teacher = new schema({
     type: {
         type: String
     },
-    course: {
-        type: String
+    courses: {
+        items: [{
+            courseid: {
+                type: schema.Types.ObjectId,
+                ref: 'Course'
+            },
+            name: {
+                type: String
+            }
+        }],
+
     }
-
-
-
 });
 
-//const testt = mongoose.model('User', User);
+Teacher.methods.addco = function(x) {
+    const index = this.courses.items.findIndex(async cp => {
+        return cp.courseid.toString() === x.toString();
+    });
+    const updatee = [...this.courses.items];
+    const update = [];
+    //console.log(x);
+    updatee.push({
+        courseid: x,
+        name: x.name
+    })
+    const updated = {
+        items: updatee,
+    };
+    this.courses = updated;
 
-//async function create() {
-
-//   const test = new testt({
-
-//     name: "amir",
-//   namekarbary: "qwe",
-// password: "123"
-
-
-// })
-
-//const vv = await test.save();
-
-//console.log(vv);
-
-//}
-
-//create();
-
-
+    this.save();
+}
 module.exports = mongoose.model('Teacher', Teacher);

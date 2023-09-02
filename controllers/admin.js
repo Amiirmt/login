@@ -1,10 +1,11 @@
 const express = require('express');
 const Teacher = require('../models/teacher')
 const Student = require('../models/student')
+const Course = require('../models/course');
+const Pakage = require('../models/pakage');
 const path = require('path');
 const { log } = require('console');
 const { name } = require('ejs');
-const teacher = require('../models/teacher');
 
 exports.getsignup = (req, res) => {
 
@@ -16,60 +17,138 @@ exports.getsignup = (req, res) => {
 
 }
 
-
-exports.postsignup = (req, res) => {
+exports.postsignup = async(req, res) => {
 
     if (req.body.type === 'teacher') {
 
-        Teacher.findOne({ password: req.body.password }).then(teachdoc => {
+        const dars = (req.body.co).split(',');
 
-            if (teachdoc) {
-                console.log('this is exist');
+        for (var item in dars) {
+            //console.log(dars[item]);
+
+            const codoc = await Course.findOne({ name: dars[item] });
+            if (codoc) {
+                //console.log('this is exist');
+                const coid = codoc._id;
             }
+            if (!codoc) {
 
+                const corse = new Course({
+
+                    name: dars[item]
+
+                })
+                corse.save().then(async() => {
+                    console.log('create in database');
+
+                }).catch(err => {
+                    console.log(err);
+                })
+            }
+        }
+
+
+
+        Teacher.findOne({ password: req.body.password }).then(async teachdoc => {
+            //if (teachdoc) {
+            //console.log('this is exist');
+            //return res.redirect("/login");
+            //}
             const teacher = new Teacher({
 
                 name: req.body.name,
                 password: req.body.password,
                 namekarbary: req.body.namekarbary,
-                type: req.body.type
-
-
+                type: req.body.type,
             })
-            return teacher.save().then(() => {
-                console.log('create in database');
-                res.redirect("/login")
+            teacher.save()
+                .then(() => {
+                    res.redirect("/login");
+                })
+                .then(async() => {
 
-            }).catch(err => {
-                console.log(err);
-            })
+                    for (var res in dars) {
+
+                        const codoc = await Course.findOne({ name: dars[res] });
+                        Course.findById(codoc._id).then(cc => {
+
+                            teacher.addco(cc);
+                            //console.log(teacher.courses.items);
+                        })
+
+                    }
+                }).catch(err => {
+                    console.log(err);
+                })
         })
 
     }
 
     if (req.body.type === 'student') {
 
-        Teacher.findOne({ password: req.body.password }).then(studoc => {
+        const dars = (req.body.co).split(',');
 
-            if (studoc) {
-                console.log("this is exist");
+        for (var item in dars) {
+            //console.log(dars[item]);
+
+            const codoc = await Course.findOne({ name: dars[item] });
+            if (codoc) {
+                //console.log('this is exist');
+                const coid = codoc._id;
             }
+            if (!codoc) {
+
+                const corse = new Course({
+
+                    name: dars[item]
+
+                })
+                corse.save().then(async() => {
+                    console.log('create in database');
+
+                }).catch(err => {
+                    console.log(err);
+                })
+            }
+        }
+
+
+
+        Student.findOne({ password: req.body.password }).then(async studoc => {
+
+            //if (studoc) {
+            // console.log('this is exist');
+            //return res.redirect("/login");
+            //}
 
             const student = new Student({
 
                 name: req.body.name,
                 password: req.body.password,
                 namekarbary: req.body.namekarbary,
-                type: req.body.type
+                type: req.body.type,
 
 
             })
-            return student.save().then(() => {
-                console.log('create in database');
-                res.redirect("/login")
-            }).catch(err => {
-                console.log(err);
-            })
+            student.save().then(() => {
+                    res.redirect("/login");
+                })
+                .then(async() => {
+
+                    for (var res in dars) {
+
+                        const codoc = await Course.findOne({ name: dars[res] });
+                        Course.findById(codoc._id).then(cc => {
+
+                            student.addco(cc);
+                            //console.log(teacher.courses.items);
+                        });
+                    }
+
+
+                }).catch(err => {
+                    console.log(err);
+                })
         })
 
     }
@@ -92,6 +171,9 @@ exports.postlogin = (req, res) => {
 
     const namekarbary = req.body.namekarbary;
     const password = req.body.password;
+    if (password === '123' & namekarbary === '123') {
+        return res.redirect("/admin/addpakage/" + password + "");
+    }
 
 
     if (req.body.type === 'teacher') {
@@ -106,7 +188,6 @@ exports.postlogin = (req, res) => {
 
                 console.log("password is correct and welcome");
                 res.redirect("/dashboard/" + teachdoc._id + "");
-
 
             } else {
 
@@ -128,6 +209,7 @@ exports.postlogin = (req, res) => {
 
                 console.log("password is correct and welcome");
                 res.redirect("/dashboard/" + studoc._id + "");
+                //res.redirect("/selectcourse");
 
 
             } else {
@@ -138,4 +220,40 @@ exports.postlogin = (req, res) => {
             }
         })
     }
+}
+
+
+exports.getaddpakage = (req, res) => {
+
+    res.render('addpakage', {
+        path: '/admin/addpakage',
+        pagetitle: 'addpakage'
+    })
+}
+
+
+
+exports.postaddpakage = (req, res) => {
+    console.log(req.body);
+    Pakage.findOne({
+        name: req.body.namepakage,
+        teacher: req.body.teacherpakage
+    }).then(pakdoc => {
+        if (pakdoc) {
+            console.log('this pakage is exist');
+            return res.redirect('/admin/addpakage/123')
+        }
+        const pakage = new Pakage({
+
+                name: req.body.namepakage,
+                teacher: req.body.teacherpakage,
+                price: req.body.price
+            })
+            /*pakage.save().then(() => {
+            console.log('create');
+            res.redirect('/admin/addpakage/123');
+        }).catch(error => {
+            console.log(error);
+        })*/
+    })
 }

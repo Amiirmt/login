@@ -5,9 +5,16 @@
     <title>
         <%= pagetitle %>
     </title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="../public/style.css">
 </head>
 
+
 <body bgcolor="aqua">
+
     <form action="/signup" method="post">
 
         <h1 align="middle"> regester </h1>
@@ -25,14 +32,40 @@
             <option>student</option>
 
         </select>
+        <br> selectcourse
         <br>
 
+        <input type="hidden" id="co" name="co">
+
+        <multi-input id="c">
+
+            <input list="speakers">
+            <datalist id="speakers">
+
+            <select >
+                <option value="riazi">riazi</option>
+                <option value="fizik">fizik</option>
+                <option value="shimi">shimi</option>
+                </select>
+
+            </datalist>
+        </multi-input>
 
 
-        <button type="submit">send </button>
+
+
+
+        <button id="get" type="submit ">send</button>
 
     </form>
 
 </body>
+
+<script src="multi-input.js "></script>
+<script src="script.js "></script>
+
+
+
+
 
 </html>
