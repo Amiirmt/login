@@ -2,7 +2,7 @@ const express = require('express');
 const Teacher = require('../models/teacher')
 const Student = require('../models/student')
 const Course = require('../models/course');
-const Pakage = require('../models/pakage');
+const Pakage = require('../models/exam');
 const path = require('path');
 const { log } = require('console');
 const { name } = require('ejs');
@@ -75,7 +75,6 @@ exports.postsignup = async(req, res) => {
                             teacher.addco(cc);
                             //console.log(teacher.courses.items);
                         })
-
                     }
                 }).catch(err => {
                     console.log(err);
@@ -245,11 +244,14 @@ exports.postaddpakage = (req, res) => {
         }
         const pakage = new Pakage({
 
-                name: req.body.namepakage,
-                teacher: req.body.teacherpakage,
-                price: req.body.price
-            })
-            /*pakage.save().then(() => {
+            name: req.body.namepakage,
+            teacher: req.body.teacherpakage,
+            price: req.body.price
+        })
+        const x = res.json(pakage);
+        console.log(x);
+
+        /*pakage.save().then(() => {
             console.log('create');
             res.redirect('/admin/addpakage/123');
         }).catch(error => {

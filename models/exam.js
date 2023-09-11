@@ -4,18 +4,18 @@ const { Schema } = require('mongoose');
 
 const schema = mongoose.Schema;
 
-const Pakage = new schema({
+const exam = new schema({
 
-    name: {
+    nameexam: {
         type: String
     },
-    teacher: {
+    time: {
         type: String,
     },
-    price: {
-        type: String
+    file: {
+        type:String
     }
 
 });
 
-module.exports = mongoose.model('Pakage', Pakage);
+module.exports = mongoose.model('Exam', exam);
