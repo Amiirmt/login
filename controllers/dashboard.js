@@ -313,3 +313,104 @@ exports.joinexam =async(req,res,next)=>{
            next(err);
     }
 }
+
+exports.uploadexam = async(req,res,next) => {
+
+    const nameexam = req.body.nameexam;
+    const examid = req.body.examid;
+    const stdid =req.params.userid;
+    const file = req.file; 
+    try{
+        
+        const std = await Student.findById(stdid);
+        
+        // if(cp){
+        //     const error = new Error("this file is exit")
+        //     error.statusCode = 404;
+        //     console.log(error);
+        //     throw error; 
+        // } 
+        const exam = await Exam.findById(examid);
+        if(!exam){
+            const error = new Error("not found this exam");
+            error.statusCode = 404;
+            console.log(error);
+            throw error; 
+        }
+        if(std.uploadexam.items.fileuploaded){
+            const error = new Error("one file is uploaded");
+            error.statusCode = 404;
+            console.log(error);
+            throw error; 
+        }
+
+        const x = std.uploadexam.items.push({
+                exam : exam._id,
+                name : nameexam,
+                fileuploaded : file.path
+        })
+        //console.log(std);
+         await std.save()
+        res.status(200).json({
+            massage:'push in databse',
+             user:std
+        });
+
+    }catch(err){
+       if(!err.statusCode){
+        error.status=500;
+       }
+       next(err);
+    }
+}
+
+exports.updateupload =async (req,res,next)=>{
+
+    const examid = req.body.examid; 
+    const file = req.file; 
+
+    try{
+       
+        const std = await Student.findById(req.params.userid)
+        const exam = await Exam.findById(examid);
+
+        if(!std){
+            const error = new Error("not found user")
+            error.statusCode = 404;
+            console.log(error);
+            throw error; 
+                
+        }
+        if(!exam){
+            const error = new Error("not found exam")
+            error.statusCode = 404;
+            console.log(error);
+            throw error; 
+                
+        }
+        
+            for(var i in std.uploadexam.items){
+                
+                if(std.uploadexam.items[i].exam == examid){
+                    clearfile(std.uploadexam.items[i].fileuploaded);
+                    std.uploadexam.items[i].fileuploaded = file.path;
+                }
+                
+            }
+        await std.save();
+         
+       
+        res.status(200).json({
+            massage: 'updated successfully',
+            user: std,
+
+        })
+    }
+    
+    catch(err){
+        if(!err.statusCode){
+            error.status=500;
+           }
+           next(err);
+    }
+}

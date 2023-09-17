@@ -1,8 +1,12 @@
 const express = require('express');
-const Teacher = require('../models/teacher')
-const Student = require('../models/student')
+const Teacher = require('../models/teacher');
+const Student = require('../models/student');
 const Course = require('../models/course');
-const Pakage = require('../models/exam');
+const Pakage = require('../models/pakage');
+const Exam = require('../models/exam');
+const multer = require('multer');
+var upload = multer({dest:'./uploads/'});
+const fs= require('fs');
 const path = require('path');
 const { log } = require('console');
 const { name } = require('ejs');
@@ -50,10 +54,10 @@ exports.postsignup = async(req, res) => {
 
 
         Teacher.findOne({ password: req.body.password }).then(async teachdoc => {
-            //if (teachdoc) {
-            //console.log('this is exist');
-            //return res.redirect("/login");
-            //}
+            if (teachdoc) {
+            console.log('this is exist');
+            return res.redirect("/login");
+            }
             const teacher = new Teacher({
 
                 name: req.body.name,
@@ -186,11 +190,16 @@ exports.postlogin = (req, res) => {
             if (teachdoc) {
 
                 console.log("password is correct and welcome");
+                res.status(200).json({
+                  user:teachdoc
+                })
                 res.redirect("/dashboard/" + teachdoc._id + "");
 
             } else {
+                
 
                 console.log("password or namekarbary is incorrect");
+
                 return res.redirect("/signup")
 
             }
@@ -221,41 +230,150 @@ exports.postlogin = (req, res) => {
     }
 }
 
+exports.getpakage = async(req,res,next)=>{
+    try{
 
-exports.getaddpakage = (req, res) => {
-
-    res.render('addpakage', {
-        path: '/admin/addpakage',
-        pagetitle: 'addpakage'
-    })
-}
-
-
-
-exports.postaddpakage = (req, res) => {
-    console.log(req.body);
-    Pakage.findOne({
-        name: req.body.namepakage,
-        teacher: req.body.teacherpakage
-    }).then(pakdoc => {
-        if (pakdoc) {
-            console.log('this pakage is exist');
-            return res.redirect('/admin/addpakage/123')
-        }
-        const pakage = new Pakage({
-
-            name: req.body.namepakage,
-            teacher: req.body.teacherpakage,
-            price: req.body.price
-        })
-        const x = res.json(pakage);
-        console.log(x);
-
-        /*pakage.save().then(() => {
-            console.log('create');
-            res.redirect('/admin/addpakage/123');
-        }).catch(error => {
+        const pakage  = await Pakage.find({});
+        if(!pakage){
+            const error = new Error("not found");
+            error.statusCode = 402;
             console.log(error);
-        })*/
+            throw error; 
+        }
+        res.status(200).json({
+            massage: 'ypur pakage',
+            pakage:pakage
+        })
+
+    }
+    catch(err){
+        if(!err.statusCode){
+            err.status=500;
+           }
+           next(err);
+    }
+} 
+
+exports.addpakage = async(req, res,next) => {
+   try{
+    const name = req.body.namepakage;
+    const teacher = req.body.teachername;
+    const price = req.body.price;
+    const file = req.file
+
+    const result = await Pakage.findOne({
+        file:file.path,
     })
+    for(var i in result) {
+        if(result[i].file){
+            const error = new Error("this file is exist")
+            error.statusCode = 404;
+            console.log(error);
+            throw error; 
+        }
+    }
+   
+    const pakage = new Pakage({
+        name:name,
+        teacher:teacher,
+        price:price,
+        file:file.path
+    })
+
+    await pakage.save();
+    res.status(200).json({
+        massage : 'success save pakage',
+        pakage : pakage
+    })
+   }catch(err){
+    if(!err.statusCode){
+        err.status=500;
+       }
+       next(err);
+   }
 }
+
+exports.updatepakage = async(req,res,next)=>{
+    try{
+        const name = req.body.namepakage;
+        const teacher = req.body.teachername;
+        const price = req.body.price;
+        const file = req.file
+    
+        const pakage = await Pakage.findById(req.params.pakageid)
+        if(!pakage){
+            const error = new Error("this file not found")
+            error.statusCode = 404;
+            console.log(error);
+            throw error; 
+        }
+        if(file.path !== pakage.file){
+            await clearfile(pakage.file);
+            pakage.file = file.path;
+         }
+        
+            pakage.name=name
+            pakage.teacher=teacher
+            pakage.price=price
+                    
+         await pakage.save();
+        res.status(200).json({
+            massage : 'success save pakage',
+            pakage : pakage
+        })
+       }catch(err){
+        if(!err.statusCode){
+            err.status=500;
+           }
+           next(err);
+       }
+}
+
+
+const clearfile=async(file) => {
+
+    file= path.join(__dirname,'..',file);
+
+    if(await fs.existsSync(file)){
+
+       await fs.unlinkSync(file,(err)=>{
+            throw err;
+        });
+        console.log('file cleared');
+    }
+    else{
+        console.log('file not found');
+    }
+
+
+}
+
+exports.deletepakage = async(req,res,next)=>{
+    try{
+       
+        const pakage = await Pakage.findById(req.params.pakageid)
+
+        if(!pakage){
+            const error = new Error("not found")
+            error.statusCode = 404;
+            console.log(error);
+            throw error; 
+        }
+        clearfile(pakage.file)
+        await Pakage.deleteOne({_id: req.params.pakageid});
+        
+        res.status(200).json({
+            massage: 'file is deleted',
+           
+        })
+    }catch(err){
+        if(!err.statusCode){
+            err.status=500;
+           }
+           next(err);
+    }
+}
+
+
+
+

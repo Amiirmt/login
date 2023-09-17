@@ -15,7 +15,6 @@ const storage = multer.diskStorage({
         cp(null, file.originalname );
     }
 });
-
 const fileFilter = (req, file, cp) => {
     if (file.mimetype === 'application/pdf') {
         cp(null, true);
@@ -54,10 +53,13 @@ const adminrouter = require('./routes/admin');
 
 const dashboardrouter = require('./routes/dashboard');
 
+const shoprouter = require('./routes/shop');
+
 app.use(dashboardrouter);
 
-
 app.use(adminrouter);
+
+app.use(shoprouter);
 
 
 app.use(express.static(path.join(__dirname, 'public')));

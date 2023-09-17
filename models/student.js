@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 const express = require('express');
+const Logger = require('nodemon/lib/utils/log');
+
 
 const schema = mongoose.Schema;
 
@@ -27,31 +29,31 @@ const Student = new schema({
                 type: String
             }
         }]
+    },
+    uploadexam: {
+        items: [{
+            exam: {
+                type: schema.Types.ObjectId,
+                ref: 'Exam'
+            },
+            name: {
+                type: String
+            },
+            fileuploaded: {
+                type:String
+            }
+        }]
+    },
+    cart:{
+        items:[{
+            pakage:{
+                type:Object,
+                ref :'Pakage'
+            }
+            }
+        ]
     }
-
-
 });
-
-//const testt = mongoose.model('User', User);
-
-//async function create() {
-
-//   const test = new testt({
-
-//     name: "amir",
-//   namekarbary: "qwe",
-// password: "123"
-
-
-// })
-
-//const vv = await test.save();
-
-//console.log(vv);
-
-//}
-
-//create();
 
 Student.methods.addco = function(x) {
     const index = this.courses.items.findIndex(cp => {
@@ -63,13 +65,30 @@ Student.methods.addco = function(x) {
         name: x.name
     })
     const updated = {
-        items: update
+        items: {...update._doc}
     };
     this.courses = updated;
 
 
     this.save();
+}
 
+Student.methods.addcart = function(x) {
+    const index = this.cart.items.findIndex(cp => {
+        return cp.pakage._id.toString() === x._id.toString();
+    });
+    const update = [...this.cart.items];
+    update.push({
+        pakage: {...x},
+        
+    })
+    const updated = {
+        items: update
+    };
+    this.cart =updated;
+
+    this.save();
+    
 
 }
 
