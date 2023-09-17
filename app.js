@@ -55,11 +55,15 @@ const dashboardrouter = require('./routes/dashboard');
 
 const shoprouter = require('./routes/shop');
 
+const homerouter = require('./routes/home')
+
 app.use(dashboardrouter);
 
 app.use(adminrouter);
 
 app.use(shoprouter);
+
+app.use(homerouter);
 
 
 app.use(express.static(path.join(__dirname, 'public')));

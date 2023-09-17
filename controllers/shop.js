@@ -10,12 +10,14 @@ const fs= require('fs');
 const path = require('path');
 const { log } = require('console');
 const { name } = require('ejs');
+const pakage = require('../models/pakage');
+const { removeAllListeners } = require('process');
 
 exports.postcart = async(req,res,next)=>{
 
-    const pakage = await Pakage.findById(req.body.pakageid)
+    const pakage = await Pakage.findById(req.body.pakage)
  
-    const user = await Student.findById(req.params.userid)
+    const user = await Student.findById(req.body.user)
 
     const result = await Pakage.findById(pakage);
 
@@ -27,7 +29,6 @@ exports.postcart = async(req,res,next)=>{
             throw error; 
         }
         user.addcart(pakage);
-        //console.log(user.cart.items[0]);
         res.status(200).json({
             massage : 'success in cart',
             user:user
@@ -40,5 +41,40 @@ exports.postcart = async(req,res,next)=>{
            next(err);
     }
 
+
+}
+
+
+exports.deletecart = async(req,res,next)=>{
+    
+    const user = await Student.findById(req.body.user);
+
+    const pakageid = req.body.pakage;
+
+    
+    try{
+        if(!user){
+            const error = new Error("not user found")
+            error.statusCode = 404;
+            console.log(error);
+            throw error; 
+        }
+        for(var i = 0; i < user.cart.items.length; i++){
+            if(user.cart.items[i].pakage._id.toString() === pakageid){
+                user.cart.items.splice(i, 1);
+                i--;
+            }
+        }
+        await user.save();
+        res.status(200).json({
+            massage: 'file is deleted',
+            cart:user.cart.items
+        })
+    }catch(err){
+        if(!err.statusCode){
+            err.status=500;
+           }
+           next(err);
+    }
 
 }
