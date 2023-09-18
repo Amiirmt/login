@@ -66,7 +66,7 @@ exports.getdashboard = async(req, res) => {
         }));
        
         res.status(200).json({
-            user: user.namekarbary,
+            user: user,
             courses: transformedResults
         });
     } catch (error) {
@@ -148,6 +148,37 @@ exports.getdashboard = async(req, res) => {
 
 }
 
+exports.getexam=async (req,res,next) => {
+
+    try{
+       
+        const teacher = await Teacher.findById(req.params.userid);
+        if(!teacher){
+            const error = new Error("not teacher found");
+            error.statusCode = 402;
+            console.log(error);
+            throw error; 
+        }
+        const exam = await Exam.find({})
+        let result=[];
+        for(var i in exam){
+            if(exam[i].creator._id == req.params.userid){
+                 result.push(exam[i]);
+            }
+        }
+        res.status(200).json({
+            massage:'create in databse',
+            exams:result
+        });
+    }catch(err){
+       if(!err.statusCode){
+        error.status=500;
+       }
+       next(err);
+    }
+}
+
+
 exports.createexam = async(req,res,next) => {
 
     const nameexam = req.body.nameexam;
@@ -155,10 +186,13 @@ exports.createexam = async(req,res,next) => {
     const file = req.file; 
     
     try{
-        //const cp = await Exam.findOne({$or: [{nameexam: nameexam}, {file: file.path}]});
-       // console.log(cp);
+        const teacher = await Teacher.findById(req.params.userid);
 
-       const cp = await Exam.findOne({ file: file.path});
+        let teacherCopy = { ...teacher._doc }; // Make a copy of the teacher object
+
+        delete teacherCopy.courses; // Remove the 'courses' property from the copied object
+
+        const cp = await Exam.findOne({ file: file.path});
         if(cp){
             const error = new Error("this file is exit")
             error.statusCode = 404;
@@ -169,11 +203,12 @@ exports.createexam = async(req,res,next) => {
 
             nameexam: nameexam,
             time : time,
-            file:file.path
+            file:file.path,
+            creator:teacherCopy,
         }) 
         exam.save();
         const result =  await Exam.find({});
-        console.log(result);
+        //console.log(result);
         res.status(200).json({
             massage:'create in databse',
             exams:result
@@ -304,7 +339,7 @@ exports.joinexam =async(req,res,next)=>{
         console.log(exam);
         res.status(200).json({
             massage: 'your exam is now',
-            exam: exam
+            exam: exam,
         })
     }catch(err){
         if(!err.statusCode){
@@ -323,13 +358,7 @@ exports.uploadexam = async(req,res,next) => {
     try{
         
         const std = await Student.findById(stdid);
-        
-        // if(cp){
-        //     const error = new Error("this file is exit")
-        //     error.statusCode = 404;
-        //     console.log(error);
-        //     throw error; 
-        // } 
+                
         const exam = await Exam.findById(examid);
         if(!exam){
             const error = new Error("not found this exam");
@@ -350,7 +379,7 @@ exports.uploadexam = async(req,res,next) => {
                 fileuploaded : file.path
         })
         //console.log(std);
-         await std.save()
+        await std.save()
         res.status(200).json({
             massage:'push in databse',
              user:std
@@ -408,6 +437,33 @@ exports.updateupload =async (req,res,next)=>{
     }
     
     catch(err){
+        if(!err.statusCode){
+            error.status=500;
+           }
+           next(err);
+    }
+}
+
+
+exports.getshow_studentuploads = async (req,res,next) => {
+    
+    try{
+        const exam = req.body.exam;
+        const examid = await Exam.find({
+            nameexam:exam
+        })
+        if(!examid){
+            const error = new Error("not exam found")
+            error.statusCode = 403;
+            console.log(error);
+            throw error;
+        }
+        
+        res.status(200).json({
+            massage: 'your exam is now',
+        })
+        // یخش نویسنده امتحان رو درست کن بعدش بیا اینو بنویس
+    }catch(err){
         if(!err.statusCode){
             error.status=500;
            }

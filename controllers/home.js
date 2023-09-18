@@ -39,3 +39,19 @@ exports.gethome = async(req,res,next)=>{
     }
 
 }
+exports.showpakage=async(req,res,next)=>{
+
+    try{
+       
+      const pakage =await Pakage.find({})
+      res.status(200).json({
+        massage:'pakage',
+        pakage:pakage
+      }) 
+    }catch(err){
+        if(!err.statusCode){
+            err.status=500;
+           }
+           next(err);
+    }
+}
