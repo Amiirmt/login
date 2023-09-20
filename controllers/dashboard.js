@@ -74,7 +74,8 @@ exports.getdashboard = async(req, res) => {
         console.error(error);
         res.status(500).json({ error: 'Server error' });  
     }
-};
+    };
+
             updateUser(req, res);
         }
     });
@@ -448,25 +449,48 @@ exports.updateupload =async (req,res,next)=>{
 exports.getshow_studentuploads = async (req,res,next) => {
     
     try{
-        const exam = req.body.exam;
-        const examid = await Exam.find({
-            nameexam:exam
-        })
-        if(!examid){
-            const error = new Error("not exam found")
-            error.statusCode = 403;
-            console.log(error);
-            throw error;
-        }
-        
-        res.status(200).json({
-            massage: 'your exam is now',
-        })
-        // یخش نویسنده امتحان رو درست کن بعدش بیا اینو بنویس
-    }catch(err){
-        if(!err.statusCode){
-            error.status=500;
+       const examid = req.body.examid;
+       const exam = await Exam.findById(examid);
+       if(!exam){
+        const error = new Error("not found this exam");
+        error.statusCode = 404;
+        console.log(error);
+        throw error; 
+    }
+
+       const students = await Student.find({});
+       let upload = [];
+       let std = [];
+       let result;
+       
+       for(let student of students) {
+           if (student.uploadexam && student.uploadexam.items) {
+               for(let item of student.uploadexam.items) {
+                
+                   if (item.exam.toString() === req.body.examid) {
+                    result = {...student._doc}
+                    delete result.courses
+                    delete result.cart
+                    delete result.uploadexam 
+                    std.push(result);
+                    upload.push(item);                   
+                    //break; 
+                   }
+               } 
            }
-           next(err);
+       }
+   
+       res.status(200).json({
+            message: 'Exams fetched successfully',
+            student : std,
+            upload:upload
+           
+       });
+
+    }catch(err){
+       if(!err.statusCode){
+        error.status=500;
+       }
+       next(err);
     }
 }

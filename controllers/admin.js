@@ -375,5 +375,44 @@ exports.deletepakage = async(req,res,next)=>{
 }
 
 
+exports.getorder = async(req,res,next)=>{
+
+    try{
+       
+       
+        const students = await Student.find({});
+
+        let orders = [];
+        
+        let std = [];
+
+        for(let student of students ){
+            
+                result = {...student._doc}
+                delete result.courses
+                delete result.cart
+                delete result.uploadexam
+                delete result.password
+                std.push(result); 
+                orders.push(student.cart);
+           
+        }
+        
+        res.status(200).json({
+            massage: 'orders',
+            student : std,
+            orders:orders
+
+        })
+    }catch(err){
+        if(!err.statusCode){
+            err.status=500;
+           }
+           next(err);
+    }
+
+}
+
+
 
 

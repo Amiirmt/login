@@ -19,8 +19,6 @@ exports.postcart = async(req,res,next)=>{
  
     const user = await Student.findById(req.body.user)
 
-    const result = await Pakage.findById(pakage);
-
     try{
         if(!user){
             const error = new Error("not user found")
