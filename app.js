@@ -72,7 +72,6 @@ app.use((error, req, res, next) => {
     console.log(error);
     const status = error.statusCode || 500;
     const massage = error.massage;
-
     res.status(status).json({ massage: massage });
 })
 

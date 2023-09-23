@@ -39,6 +39,7 @@ exports.gethome = async(req,res,next)=>{
     }
 
 }
+
 exports.showpakage=async(req,res,next)=>{
 
     try{

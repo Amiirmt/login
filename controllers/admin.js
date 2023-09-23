@@ -10,6 +10,9 @@ const fs= require('fs');
 const path = require('path');
 const { log } = require('console');
 const { name } = require('ejs');
+const teacher = require('../models/teacher');
+const course = require('../models/course');
+const Logger = require('nodemon/lib/utils/log');
 
 exports.getsignup = (req, res) => {
 
@@ -413,6 +416,170 @@ exports.getorder = async(req,res,next)=>{
 
 }
 
+exports.getteacher = async(req,res,next)=>{
+
+    try{
+       
+        const teacher = await Teacher.find({});
+        if(!teacher){
+            const error = new Error("not teacher found")
+            error.statusCode = 402;
+            console.log(error);
+            throw error; 
+        }
+       
+        res.status(200).json({
+            massage: 'all teacher',
+            teacher:teacher
+        })
+    }catch(err){
+        if(!err.statusCode){
+            err.status=500;
+           }
+           next(err);
+    }
+}
+
+exports.addteacher = async(req,res,next)=>{
+
+    try{
+       
+        const teachername = req.body.name;
+        const teacher_namekarbary = req.body.namekarbary;
+        const teacher_password= req.body.password;
+        const teacher_courses = req.body.course;
+        
+        const teach = await Teacher.findOne({
+            name:teachername
+        })
+        if(teach){
+            const error = new Error("this teacher is exist")
+            error.statusCode = 402;
+            console.log(error);
+            throw error; 
+        }
+        
+        
+        const teacher = new Teacher({
+            name:teachername,
+            namekarbary:teacher_namekarbary,
+            password:teacher_password,
+        })
+        let courses=[];
+
+        for(var item of teacher_courses.split(',')){
+            //console.log(item);
+            let res = await Course.find({
+                name:item
+            })
+           
+            courses.push(res[0]._id)
+        }
+        for(var i in courses){
+             await teacher.addco(courses[i].toString());
+         
+        }
+        
+        res.status(200).json({
+            massage: 'added',
+            teacher:teacher
+        })
+    }catch(err){
+        if(!err.statusCode){
+            err.status=500;
+           }
+           next(err);
+    }
+}
+
+exports.updeteteacher=async(req,res,next)=>{
+    try{
+       
+        const teacherid = req.params.userid;
+        const name = req.body.name;
+        const namekarbary = req.body.namekarbary;
+        const password = req.body.password;
+        const courses = req.body.course;
+        const teacher = await Teacher.findById(teacherid);
+
+        if(!teacher){
+            const error = new Error("not teacher found")
+            error.statusCode = 402;
+            console.log(error);
+            throw error; 
+        }
+       
+        if(name){
+            teacher.name=name;
+            
+        }
+        if(namekarbary){
+            teacher.namekarbary=namekarbary;
+           
+
+        }
+        if(password){
+            teacher.password=password;
+          
+
+        }
+        if(courses){
+            let course=[];
+           
+            teacher.courses.items=[];
+           
+            for(var item of courses.split(',')){
+
+                let res = await Course.find({
+                    name:item
+                })
+                course.push(res[0]._id)
+            }
+            for(var i in course){
+                await teacher.updateco(course[i].toString());
+         
+            }
+        }    
+        await teacher.save();   
+        res.status(200).json({
+            massage: 'updated',
+            teacher:teacher
+        })
+    }catch(err){
+        if(!err.statusCode){
+            err.status=500;
+           }
+           next(err);
+    }
+}
+
+
+exports.deleteteacher = async(req,res,next)=>{
+
+    try{
+       
+        const teacherid = req.body.teacher
+        const teacher = await Teacher.findById(teacherid);
+        if(!teacher){
+            const error = new Error("not teacher found")
+            error.statusCode = 402;
+            console.log(error);
+            throw error; 
+        }
+        await Teacher.deleteOne(teacher._id);
+        //await teacher.save();   
+        res.status(200).json({
+            massage: 'updated',
+            teacher:await Teacher.find({})
+        })
+    }catch(err){
+        if(!err.statusCode){
+            err.status=500;
+           }
+           next(err);
+    }
+
+}
 
 
 

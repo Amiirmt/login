@@ -494,3 +494,36 @@ exports.getshow_studentuploads = async (req,res,next) => {
        next(err);
     }
 }
+
+
+exports.getmypakage = async(req,res,next)=>{
+
+    try{
+      
+                
+        const studentid = req.params.userid;
+        const student = await Student.findById(studentid);
+
+        if(!student){
+            const error = new Error("not found this user");
+            error.statusCode = 402;
+            console.log(error);
+            throw error; 
+        }
+        //console.log(student.cart.items);
+   
+
+        res.status(200).json({
+            message: 'your pakage',
+            cart : student.cart.items,
+        });
+
+    }catch(err){
+       if(!err.statusCode){
+        error.status=500;
+       }
+       next(err);
+    }
+}
+
+

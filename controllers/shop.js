@@ -48,12 +48,11 @@ exports.deletecart = async(req,res,next)=>{
     const user = await Student.findById(req.body.user);
 
     const pakageid = req.body.pakage;
-
     
     try{
         if(!user){
             const error = new Error("not user found")
-            error.statusCode = 404;
+            error.statusCode = 402;
             console.log(error);
             throw error; 
         }
@@ -75,4 +74,34 @@ exports.deletecart = async(req,res,next)=>{
            next(err);
     }
 
+}
+
+
+exports.getmyshopping= async(req,res,next)=>{
+    
+    try{
+
+        const studentid = req.body.user
+        const student = await Student.findById(studentid)
+
+        if(!student){
+            const error = new Error("not this user found")
+            error.statusCode = 402;
+            console.log(error);
+            throw error; 
+        }
+        
+        
+        res.status(200).json({
+            message: 'your shopping',
+            cart : student.cart.items,
+        });
+
+    }catch(err){
+        if(!err.statusCode){
+            err.status=500;
+           }
+           next(err);
+    }
+    
 }
