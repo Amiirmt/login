@@ -9,6 +9,7 @@ const dashboardcontroll = require('../controllers/dashboard');
 router.get('/dashboard/:userid', dashboardcontroll.getdashboard);
 
 
+
 router.get('/dashboard/:userid/createexam',dashboardcontroll.getexam);
 
 router.post('/dashboard/:userid/createexam',dashboardcontroll.createexam);
@@ -16,6 +17,7 @@ router.post('/dashboard/:userid/createexam',dashboardcontroll.createexam);
 router.put('/dashboard/:userid/createexam', dashboardcontroll.updateexam);
 
 router.delete('/dashboard/:userid/createexam', dashboardcontroll.deletedexam);
+
 
 
 router.get('/dashboard/:userid/studentexam', dashboardcontroll.getshow_studentuploads);

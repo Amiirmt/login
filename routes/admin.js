@@ -34,6 +34,17 @@ router.put('/admin/updateteacher/:userid',admincontroll.updeteteacher);
 router.delete('/admin/deleteteacher',admincontroll.deleteteacher);
 
 
+
+
+router.get('/admin/addcourse',admincontroll.getcourse);
+
+router.post('/admin/addcourse',admincontroll.addcourse);
+
+router.delete('/admin/deletecourse',admincontroll.deletecorse);
+
+
+
+
 router.get('/admin/orders',admincontroll.getorder);
 
 module.exports = router;

@@ -10,9 +10,8 @@ const fs= require('fs');
 const path = require('path');
 const { log } = require('console');
 const { name } = require('ejs');
-const teacher = require('../models/teacher');
-const course = require('../models/course');
 const Logger = require('nodemon/lib/utils/log');
+
 
 exports.getsignup = (req, res) => {
 
@@ -567,7 +566,7 @@ exports.deleteteacher = async(req,res,next)=>{
             throw error; 
         }
         await Teacher.deleteOne(teacher._id);
-        //await teacher.save();   
+        
         res.status(200).json({
             massage: 'updated',
             teacher:await Teacher.find({})
@@ -580,6 +579,96 @@ exports.deleteteacher = async(req,res,next)=>{
     }
 
 }
+
+exports.getcourse = async(req,res,next)=>{
+   
+    try{
+       
+        const course = await Course.find({});
+        if(!course){
+
+          const error = new Error("not courses found")
+            error.statusCode = 402;
+            console.log(error);
+            throw error;
+        }
+        res.status(200).json({
+            massage:'corses accept',
+            course:course
+        })
+        
+    }catch(err){
+        if(!err.statusCode){
+            err.status=500;
+           }
+           next(err);
+    }
+}
+
+
+exports.addcourse = async(req,res,next)=>{
+
+    try{
+       
+        const name = req.body.name;
+        const course = await Course.findOne({
+            name:name
+        })
+        if(course){
+
+          const error = new Error("this courses exist")
+            error.statusCode = 402;
+            console.log(error);
+            throw error;
+        }
+        const co = new Course({
+            name :name
+        })
+        await co.save()
+
+        res.status(200).json({
+            massage:'corses accept',
+            course:co
+        })
+        
+    }catch(err){
+        if(!err.statusCode){
+            err.status=500;
+           }
+           next(err);
+    }
+}
+
+exports.deletecorse = async(req,res,next)=>{
+
+    try{
+       
+        const courseid = req.body.course;
+        const course = await Course.findById(courseid)
+        if(!course){
+
+          const error = new Error("not courses found")
+            error.statusCode = 402;
+            console.log(error);
+            throw error;
+        }
+        
+        await Course.deleteOne(course._id);
+
+        res.status(200).json({
+            massage:'deleted ',
+            courses:await Course.find({})
+        })
+        
+    }catch(err){
+        if(!err.statusCode){
+            err.status=500;
+           }
+           next(err);
+    }
+}
+
+
 
 
 
