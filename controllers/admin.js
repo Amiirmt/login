@@ -161,7 +161,6 @@ exports.postsignup = async(req, res) => {
 
 }
 
-
 exports.getlogin = (req, res) => {
 
     res.render('login', {
@@ -170,7 +169,6 @@ exports.getlogin = (req, res) => {
     })
 
 };
-
 
 exports.postlogin = (req, res) => {
 

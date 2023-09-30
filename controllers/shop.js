@@ -41,7 +41,6 @@ exports.postcart = async(req,res,next)=>{
 
 }
 
-
 exports.deletecart = async(req,res,next)=>{
     
     const user = await Student.findById(req.body.user);
@@ -74,7 +73,6 @@ exports.deletecart = async(req,res,next)=>{
     }
 
 }
-
 
 exports.getmyshopping= async(req,res,next)=>{
     
